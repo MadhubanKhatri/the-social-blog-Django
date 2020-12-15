@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Search | Social Blogs{% endblock %}
+
+{% block body %}
+
+<div class="container my-2">
+
+	{% if search_result %}
+	<h1 style="display:inline-block;">Search Results for: </h1>&nbsp &nbsp &nbsp
+	<span class="display-4" style="color:red">{{search_term}}</span>
+	<hr>
+    {% for result in search_result %}
+    <div class="card w-75 my-3" style="border: 2px solid;">
+  <div class="card-body">
+    <a href="{% url 'view_post' result.title %}"><h5 class="card-title">{{result.title}}</h5></a>
+    <span class="text-muted">{{result.creation_date}}</span>
+    <span class="text-muted"> · By <a href="{% url 'profile' result.user.username %}">{{result.user.first_name}} {{result.user.last_name}}</a></span>
+    <hr>
+    <p class="card-text">{{result.content |safe| truncatewords:50}}</p>
+    <a href="{% url 'view_post' result.title %}" class="btn btn-primary">Read More</a>
+  </div>
+  </div>
+  {% endfor %}
+
+  {% else %}
+    {% if search_user %}
+      {% for user in search_user %}
+      <div class="card w-75 my-3" style="border: 2px solid;">
+        <div class="card-body">
+          <span>
+            <img src="{% static user.profile_pic.url %}" width='100',height='100' style="border-radius:50%;">
+          </span>
+          <span class="display-4"><a href="#">{{user.first_name}}</a></span>
+        </div>
+      </div>
+      {% endfor %}
+  {% else %}
+    <h2>No Results Found.</h2>
+  {% endif %}
+	
+	{% endif %}
+
+
+
+
+
+</div>
+
+
+
+
+
+
+{% endblock %}

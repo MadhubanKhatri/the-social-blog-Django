@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block title %}View_Post | Social Blog{% endblock %}
+
+
+{% block body %}
+
+<div class="container">
+<div class="container my-2">
+    <div class="card w-75 my-3" style="border: 2px solid;">
+  <div class="card-body" style="word-wrap: break-word;">
+    <h1 class="card-title display-3">{{post_data.title}}</h1>
+    <span class="text-muted">{{post_data.creation_date}}</span>&nbsp &nbsp
+    <span class="text-muted">By <a href="{% url 'profile' post_data.user.first_name %}">{{post_data.user.first_name}} {{post_data.user.last_name}}</a></span>
+    <hr>
+    <p class="card-text">{{post_data.content|safe}}</p>
+
+    <form action="{% url 'like_post' post_data.title %}">
+      {% if liked %}
+        <button type="submit" class="btn btn-danger" name="post_id">UnLike</button>
+      {% else %}
+        <button type="submit" class="btn btn-info" name="post_id">Like</button>
+      {% endif %}
+      {{post_data.likes.count }}  Likes
+
+    </form>
+    
+  </div>
+
+</div>
+</div>
+
+
+{% if request.session.user %}
+
+<div class="container">
+    <div class="container my-2">
+        <h2>Comments</h2>
+        <div class="w-75">
+        <hr>
+        </div>
+        <ul class="list-unstyled">
+          {% if post_comments %}
+          {% for comment in post_comments %}
+            <li class="media">
+            <div class="w-75" style="display:inline-block">
+              <h5 class="mt-0 mb-1">{{comment.name}}</h5>
+          <p>{{comment.comment}} </p>
+            </div>
+        </li>
+          {% endfor %}
+
+          {% else %}
+            <h5>No Comments Yet.</h5>
+          {% endif %}
+  
+        </ul>
+        <div class="w-75">
+        <hr>
+        </div>
+        <form action="{% url 'add_comment' post_data.title %}" method="post">
+          {% csrf_token %}
+            <textarea style="width:300px;" name="comment" placeholder="Add Comment..."></textarea>
+            <br><br>
+            <input type="submit" name="" class="btn btn-primary" value="Add Comment">
+        </form>
+
+    </div>
+</div>
+{% endif %}
+
+
+
+<!--Related Posts-->
+<div class="container w-25" style="inline-block; position:absolute; top:70px; left:1000px;">
+<div class="list-group">
+  <p class="list-group-item list-group-item-action active">
+    Related Posts
+  </p>
+  {% for post in all_posts %}
+  	<button type="button" class="list-group-item list-group-item-action"><a href="{{post.title}}">{{post.title}}</a></button>
+  {% endfor %}
+</div>
+</div>
+
+
+
+
+
+
+
+
+{% endblock %}

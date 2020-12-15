@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact | Social Blogs{% endblock %}
+
+
+{% block body %}
+
+	
+
+
+<div class="jumbotron jumbotron-fluid">
+    <div class="container-fluid" style="margin-top:30px; background: white; box-shadow: 1px 1px 10px 1px black; padding: 10px; width: 600px;">
+        <form method="post" action="{% url 'contact' %}">
+        	{% csrf_token %}
+        <h1>Contact Form</h1>
+        <hr>
+
+         <div class="form-group">
+            <label for="exampleInputEmail1">Full Name</label>
+            <input type="text" class="form-control" name="full_name" style="width: 400px;" id="exampleInputEmail1" aria-describedby="emailHelp" required>
+        </div>
+
+        <div class="form-group">
+            <label for="exampleInputEmail1">Email address</label>
+            <input type="email" class="form-control" name="mail" style="width: 400px;" id="exampleInputEmail1" aria-describedby="emailHelp" required>
+        </div>
+
+        <div class="form-group">
+          <label for="exampleInputPassword1">Message</label>
+          <textarea class="form-control" name="msg" required></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Send</button>
+        </form>
+    </div>
+
+</div>
+
+
+
+{% endblock %}

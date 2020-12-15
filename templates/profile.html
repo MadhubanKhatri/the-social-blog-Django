@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+
+<!--{% load static %}-->
+{% block title %}
+  Profile | Social Blogs
+{% endblock %}}
+
+{% block body %}
+
+<div class="card text-center">
+  <div class="card-header">
+   
+   <img src="{% static user_data.profile_pic.url %}" width="180" height="180" class="img-thumbnail" alt="profile_image" style="border-radius:50%;">
+   <br>
+
+   {% if request.session.user == user_data.username %}
+   <a href="#"><label for="image_name" style="cursor:pointer;">Change Profile Picture</label></a>
+   ​<form action="{% url 'change_image' user_data.username %}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+     <input type="file" id="image_name" name="image" style="display:none;">
+     <input type="submit" value="Change"class="btn btn-warning">
+   </form>
+   {% endif %}
+
+  </div>
+  <div class="card-body">
+    <h2 class="card-title">{{user_data.first_name}} {{user_data.last_name}}</h2>
+
+    <div class="my-4" style="display:inline-block;">
+      <pre style="text-align: left;"><p class="card-text" style="font-size:22px;">{{user_data.bio}}</p></pre>
+    </div>
+    
+    <br>
+
+  
+    {% if request.session.user == user_data.username %}
+      <span>Followers: {{followers.count}}</span>
+        &nbsp&nbsp&nbsp&nbsp&nbsp
+      <span>Following: {{session_following.another_user.count}}</span>
+        <br><br>
+    <button type="button" data-toggle="modal" data-target="#editModal" class="btn btn-primary mx-2">Edit Profile</button>
+    {% else %}
+    <form action="{% url 'follow' user_data.username %}" method="post">
+    {% csrf_token %}
+  {% if user_data.username != request.session.user %}
+    <span>Followers: {{followers.count}}</span>
+      &nbsp&nbsp&nbsp&nbsp&nbsp
+    <span>Following: {{user_following.another_user.count}}</span>
+    <br><br>
+    {% if is_followed %}
+      <input type="submit" value="Unfollow" class="btn btn-danger mx-2">
+    {% else %}
+      <input type="submit" value="Follow" class="btn btn-primary mx-2">
+    {% endif %}
+  {% else %}
+  {% endif %}
+  </form>
+
+
+    <!--<button type="button" class="btn btn-primary mx-2">Follow</button>-->
+    {% endif %}
+
+  </div>
+</div>
+
+
+
+
+<!--Edit Profile Form-->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Edit</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      
+
+      <div class="modal-body">
+        <form action="{% url 'update_profile' request.session.user %}" method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+           <div class="form-group">
+            <label for="recipient-text" class="col-form-label">First Name:</label>
+            <input type="text" class="form-control" name="fname" id="recipient-text" value="{{user_data.first_name}}" required>
+          </div>
+          <div class="form-group">
+            <label for="recipient-text" class="col-form-label">Last Name:</label>
+            <input type="text" class="form-control" name="lname" id="recipient-text" value="{{user_data.last_name}}" required>
+          </div>
+          <div class="form-group">
+            <label for="recipient-email" class="col-form-label">Email:</label>
+            <input type="email" class="form-control" name="mail" id="recipient-email" value="{{user_data.email}}" required>
+          </div>
+          <div class="form-group">
+            <label for="recipient-email" class="col-form-label">Bio:</label>
+            <span id='counter'>0</span><span>/100</span>
+            <textarea class="form-control" id='bio' name="bio" oninput="myFun()" style="height: 300px;">{{user_data.bio}}</textarea>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <input type="submit" class="btn btn-primary" id='submit' value="Change">
+         </div>
+        </form>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+<div class="card mx-5 my-3" style="display: inline-grid;" >
+  <h3>Posts({{user_posts.count }})</h3>
+  <span>Total Posts Likes: {{total_post_likes}}</span>
+  {% if user_posts %}
+    {% for post in user_posts %}
+
+  <div class="card" style="border: 2px solid; width: 800px; margin-bottom:10px;">
+  <div class="card-body">
+    <h5 class="card-title"><a href="{% url 'view_post' post.title %}">{{post.title}}</a></h5>
+    <span class="text-muted">{{post.creation_date}}</span>
+    <span class="text-muted"> · {{post.likes.count}} Likes</span>
+    <p class="card-text">{{post.content |safe| truncatewords:50}}</p>
+    <a href="{% url 'view_post' post.title %}" class="btn btn-primary">Read More>></a>
+    {% if request.session.user == user_data.username %}
+      <a href="{% url 'delete_post' post.title %}" class="btn btn-danger float-right">Delete</a>
+    {% endif %}
+  </div>
+</div>
+
+  {% endfor %}
+
+  {% else %}
+    <div class="card-body">
+      <h1 class="display-4">No Posts Yet</h1>
+    </div>
+  {% endif %}
+  
+
+</div>
+
+<script type="text/javascript">
+  var bio, submit, counter;
+  bio = document.getElementById('bio');
+  submit = document.getElementById('submit');
+  counter = document.getElementById('counter');
+
+  function myFun()
+  {
+    var bio_len = bio.value.length;
+    counter.innerText = bio_len;
+
+    if (bio_len>100)
+    {
+      submit.disabled = true;
+      counter.style.color = 'red';
+    }
+    else
+    {
+      submit.disabled = false;
+      counter.style.color = '';
+    }
+  }
+
+</script>
+{% endblock %}
