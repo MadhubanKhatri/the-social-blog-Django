@@ -15,8 +15,10 @@ def home(request):
 		suggest_users = User.objects.all()
 		current_user = request.session['user']
 		session_user_obj = User.objects.get(username=current_user)
-		fuser = Followers.objects.get(user=session_user_obj)
-		following_users = fuser.another_user.all()
+		fuser = Followers.objects.get_or_create(user=session_user_obj)
+		print(fuser)
+		following_users = fuser[0].another_user.all()
+		# print(fuser[0].another_user.all())
 		user_posts = []
 		for u in following_users:
 			all_posts = u.post_set.all()
@@ -277,6 +279,7 @@ def login(request):
 		pwd = request.POST.get('pwd')
 
 		check_user = User.objects.get(username=userName, password=pwd)
+		print(check_user)
 		if check_user:
 			request.session['user'] = check_user.username
 			return redirect('home')
