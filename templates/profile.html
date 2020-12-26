@@ -7,10 +7,13 @@
 
 {% block body %}
 
-<div class="card text-center">
-  <div class="card-header">
+<div class="container text-center">
+  <div class="row">
+    <div class="col-sm">
+      <div class="card-header">
    
-   <img src="{% static user_data.profile_pic.url %}" width="180" height="180" class="img-thumbnail" alt="profile_image" style="border-radius:50%;">
+   
+   <img src="{% static user_data.profile_pic.url %}" width="180" height="180" class="img-thumbnail" alt="profile_image" style="">
    <br>
 
    {% if request.session.user == user_data.username %}
@@ -23,45 +26,52 @@
    {% endif %}
 
   </div>
-  <div class="card-body">
-    <h2 class="card-title">{{user_data.first_name}} {{user_data.last_name}}</h2>
+    </div>
+    <div class="col-8">
+      <div class="card-body">
+        <h2 class="card-title">{{user_data.first_name}} {{user_data.last_name}}</h2>
+        <b><span>Followers: {{followers.count}}</span></b>
+        &nbsp&nbsp&nbsp&nbsp&nbsp
+        <b><span>Following: {{session_following.another_user.count}}</span></b>
+        <br><br>
+        <div class="my-4" style="display:inline-block;">
+          <pre style="text-align: left;"><p class="card-text" style="font-size:22px;">{{user_data.bio}}</p></pre>
+        </div>
 
-    <div class="my-4" style="display:inline-block;">
-      <pre style="text-align: left;"><p class="card-text" style="font-size:22px;">{{user_data.bio}}</p></pre>
+        <br>
+
+
+        {% if request.session.user == user_data.username %}
+        
+        <button type="button" data-toggle="modal" data-target="#editModal" class="btn btn-primary mx-2">Edit Profile</button>
+        {% else %}
+        <form action="{% url 'follow' user_data.username %}" method="post">
+          {% csrf_token %}
+          {% if user_data.username != request.session.user %}
+          <span>Followers: {{followers.count}}</span>
+          &nbsp&nbsp&nbsp&nbsp&nbsp
+          <span>Following: {{user_following.another_user.count}}</span>
+          <br><br>
+          {% if is_followed %}
+          <input type="submit" value="Unfollow" class="btn btn-danger mx-2">
+          {% else %}
+          <input type="submit" value="Follow" class="btn btn-primary mx-2">
+          {% endif %}
+          {% else %}
+          {% endif %}
+        </form>
+
+
+        <!--<button type="button" class="btn btn-primary mx-2">Follow</button>-->
+        {% endif %}
+
+      </div>
     </div>
     
-    <br>
-
-  
-    {% if request.session.user == user_data.username %}
-      <span>Followers: {{followers.count}}</span>
-        &nbsp&nbsp&nbsp&nbsp&nbsp
-      <span>Following: {{session_following.another_user.count}}</span>
-        <br><br>
-    <button type="button" data-toggle="modal" data-target="#editModal" class="btn btn-primary mx-2">Edit Profile</button>
-    {% else %}
-    <form action="{% url 'follow' user_data.username %}" method="post">
-    {% csrf_token %}
-  {% if user_data.username != request.session.user %}
-    <span>Followers: {{followers.count}}</span>
-      &nbsp&nbsp&nbsp&nbsp&nbsp
-    <span>Following: {{user_following.another_user.count}}</span>
-    <br><br>
-    {% if is_followed %}
-      <input type="submit" value="Unfollow" class="btn btn-danger mx-2">
-    {% else %}
-      <input type="submit" value="Follow" class="btn btn-primary mx-2">
-    {% endif %}
-  {% else %}
-  {% endif %}
-  </form>
-
-
-    <!--<button type="button" class="btn btn-primary mx-2">Follow</button>-->
-    {% endif %}
-
   </div>
 </div>
+
+
 
 
 
